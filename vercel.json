@@ -1,9 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/health",
-      "schedule": "*/5 * * * *"
+  "services": {
+    "heyform": {
+      "root": ".",
+      "runtime": "container",
+      "entrypoint": "Dockerfile.vercel"
     }
-  ]
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": { "service": "heyform" } }],
+  "crons": [{ "path": "/health", "schedule": "0 9 * * *" }]
 }
