@@ -38,6 +38,8 @@ export interface FormRendererProps {
   enableNavigationArrows?: boolean
   ssr?: boolean
   onSubmit?: (values: Record<string, any>, isPartial?: boolean, stripe?: IStripe) => Promise<void>
+  /** Called whenever the respondent's answers change, e.g. to save progress. */
+  onChange?: (values: Record<string, any>) => void
 }
 
 function initStore(
@@ -115,7 +117,8 @@ export const FormRenderer: FC<FormRendererProps> = ({
   enableQuestionList,
   enableNavigationArrows,
   ssr = false,
-  onSubmit
+  onSubmit,
+  onChange
 }) => {
   const [isAndroid, setAndroid] = useState(false)
 
@@ -170,6 +173,10 @@ export const FormRenderer: FC<FormRendererProps> = ({
     ]
   )
   const [state, dispatch] = useReducer(StoreReducer, memoState)
+
+  useEffect(() => {
+    onChange?.(state.values)
+  }, [state.values])
 
   // Form suspended
   if (form.suspended) {

@@ -77,6 +77,15 @@ export const REDIS_USERNAME: string = process.env.REDIS_USERNAME
 export const REDIS_PASSWORD: string = process.env.REDIS_PASSWORD
 export const REDIS_DB: number = +process.env.REDIS_DB || 0
 export const REDIS_TLS: string = process.env.REDIS_TLS
+// Managed Redis providers such as Upstash only expose database 0. Queue keys
+// are namespaced by Bull, so sharing the session database is safe there.
+export const BULL_REDIS_DB: number = process.env.BULL_REDIS_DB
+  ? +process.env.BULL_REDIS_DB
+  : REDIS_DB + 1
+
+// Progress capture — forwards unfinished answers to a webhook (see utils/progress-capture)
+export const PROGRESS_WEBHOOK_URL: string = process.env.PROGRESS_WEBHOOK_URL
+export const PROGRESS_WEBHOOK_SECRET: string = process.env.PROGRESS_WEBHOOK_SECRET
 
 // SMTP
 export const VERIFY_USER_EMAIL: boolean = toBool(process.env.VERIFY_USER_EMAIL, false)
@@ -128,7 +137,8 @@ export const DISABLE_LOGIN_WITH_OIDC =
   helper.isEmpty(OIDC_ISSUER) ||
   !['client_secret_basic', 'client_secret_post'].includes(OIDC_CLIENT_AUTH_METHOD)
 
-export const DISABLE_LOGIN_WITH_PASSWORD: boolean = process.env.DISABLE_LOGIN_WITH_PASSWORD?.toLowerCase() === 'true'
+export const DISABLE_LOGIN_WITH_PASSWORD: boolean =
+  process.env.DISABLE_LOGIN_WITH_PASSWORD?.toLowerCase() === 'true'
 
 // Stripe
 export const STRIPE_VERSION: string = process.env.STRIPE_VERSION

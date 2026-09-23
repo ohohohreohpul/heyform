@@ -24,6 +24,10 @@ const COMPLETE_SUBMISSION_GQL = `mutation completeSubmission($input: CompleteSub
 	}
 }`
 
+const SAVE_PROGRESS_GQL = `mutation saveProgress($input: SaveProgressInput!) {
+  saveProgress(input: $input)
+}`
+
 export class EndpointService {
   static async openForm(formId: string): Promise<string> {
     const result = await axios({
@@ -82,6 +86,7 @@ export class EndpointService {
     // Google reCAPTCHA token
     recaptchaToken?: string
     partialSubmission?: boolean
+    progressSessionId?: string
   }): Promise<{ clientSecret?: string }> {
     const result = await axios({
       query: COMPLETE_SUBMISSION_GQL,
@@ -90,5 +95,21 @@ export class EndpointService {
       }
     })
     return result.completeSubmission
+  }
+
+  static async saveProgress(input: {
+    formId: string
+    sessionId: string
+    answers: Record<string, Any>
+    hiddenFields: HiddenFieldAnswer[]
+    openToken: string
+  }): Promise<boolean> {
+    const result = await axios({
+      query: SAVE_PROGRESS_GQL,
+      variables: {
+        input
+      }
+    })
+    return result.saveProgress
   }
 }

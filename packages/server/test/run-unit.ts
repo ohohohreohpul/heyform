@@ -13,7 +13,9 @@ const tests = [
   'redis-config.test.ts',
   'oauth-state.test.ts',
   'oidc-security.test.ts',
-  'oidc-provisioning.test.ts'
+  'oidc-provisioning.test.ts',
+  'progress-capture.test.ts',
+  'save-progress.test.ts'
 ]
 const serverRoot = path.resolve(__dirname, '..')
 

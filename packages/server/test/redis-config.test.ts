@@ -2,7 +2,7 @@ import * as assert from 'assert'
 
 import { BullOptionsFactory } from '../src/config/bull'
 import { RedisService, createRedisOptions } from '../src/config/redis'
-import { REDIS_DB, REDIS_TLS } from '../src/environments'
+import { BULL_REDIS_DB, REDIS_DB, REDIS_TLS } from '../src/environments'
 
 function testRedisClientsShareTlsConfiguration() {
   const applicationOptions = new RedisService().createRedisModuleOptions() as {
@@ -13,7 +13,7 @@ function testRedisClientsShareTlsConfiguration() {
   }
 
   assert.deepStrictEqual(applicationOptions.config, createRedisOptions())
-  assert.deepStrictEqual(bullOptions.redis, createRedisOptions(REDIS_DB + 1))
+  assert.deepStrictEqual(bullOptions.redis, createRedisOptions(BULL_REDIS_DB))
   assert.strictEqual('tls' in applicationOptions.config, Boolean(REDIS_TLS))
   assert.strictEqual('tls' in bullOptions.redis, Boolean(REDIS_TLS))
 

@@ -62,6 +62,12 @@ export class CompleteSubmissionInput {
   @Field({ nullable: true })
   partialSubmission?: boolean
 
+  /** Ties the finished submission to earlier saveProgress calls. */
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  progressSessionId?: string
+
   @Field()
   openToken: string
 
@@ -92,4 +98,24 @@ export class UploadFormFileType {
 
   @Field()
   size: number
+}
+
+@InputType()
+export class SaveProgressInput {
+  @Field()
+  formId: string
+
+  @Field()
+  @IsString()
+  @Length(8, 64)
+  sessionId: string
+
+  @Field(type => GraphQLJSONObject)
+  answers: Record<string, any>
+
+  @Field(type => [HiddenFieldAnswerInput])
+  hiddenFields: HiddenFieldAnswer[]
+
+  @Field()
+  openToken: string
 }

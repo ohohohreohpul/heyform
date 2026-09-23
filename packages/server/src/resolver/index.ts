@@ -65,6 +65,7 @@ export { AIResolver } from './form/ai.resolver'
 
 export { OpenFormResolver } from './endpoint/open-form.resolver'
 export { CompleteSubmissionResolver } from './endpoint/complete-submission.resolver'
+export { SaveProgressResolver } from './endpoint/save-progress.resolver'
 export { FormPasswordResolver } from './endpoint/form-password.resolver'
 
 export { SubmissionsResolver } from './submission/submissions.resolver'

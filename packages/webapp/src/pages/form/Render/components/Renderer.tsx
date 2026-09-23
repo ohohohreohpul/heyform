@@ -5,17 +5,13 @@ import {
   getWebFontURL,
   sendMessageToParent
 } from '@heyform-inc/form-renderer/src'
-import {
-  CaptchaKindEnum,
-  FieldKindEnum,
-  FormModel,
-  HiddenFieldAnswer
-} from '@heyform-inc/shared-types-enums'
-import { FC, useEffect, useRef, useState } from 'react'
+import { CaptchaKindEnum, FieldKindEnum, FormModel } from '@heyform-inc/shared-types-enums'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 
 import { EndpointService } from '../service/endpoint'
 import { recaptchaToken } from '../utils/captcha'
 import { isStripeEnabled } from '../utils/payment'
+import { queryToHiddenFields, useProgressCapture } from '../utils/progress'
 import { Uploader } from '../utils/uploader'
 import { helper } from '@heyform-inc/utils'
 
@@ -36,6 +32,12 @@ export const Renderer: FC<RendererProps> = ({ form, query, locale, contactId }) 
   const openTokenRef = useRef<string>('')
   const passwordTokenRef = useRef<string>('')
   const [isPasswordChecked, setIsPasswordChecked] = useState(false)
+  const getOpenToken = useCallback(() => openTokenRef.current, [])
+  const getHiddenFields = useCallback(
+    () => queryToHiddenFields(form.hiddenFields, query),
+    [form.hiddenFields, query]
+  )
+  const progress = useProgressCapture({ formId: form.id, getOpenToken, getHiddenFields })
 
   function loadExternalScript(id: string, src: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -144,18 +146,7 @@ export const Renderer: FC<RendererProps> = ({ form, query, locale, contactId }) 
 
       const file = await new Uploader(form, values, openTokenRef.current).start()
 
-      const hiddenFields = (form!.hiddenFields || [])
-        .map(field => {
-          const value = query[field.name]
-
-          if (helper.isValid(value)) {
-            return {
-              ...field,
-              value
-            }
-          }
-        })
-        .filter(Boolean) as HiddenFieldAnswer[]
+      const hiddenFields = getHiddenFields()
 
       const { clientSecret } = await EndpointService.completeSubmission({
         formId: form.id,
@@ -168,6 +159,7 @@ export const Renderer: FC<RendererProps> = ({ form, query, locale, contactId }) 
         openToken: openTokenRef.current,
         passwordToken: passwordTokenRef.current,
         partialSubmission,
+        progressSessionId: progress.sessionId,
         ...(token || {})
       })
 
@@ -188,6 +180,7 @@ export const Renderer: FC<RendererProps> = ({ form, query, locale, contactId }) 
         }
       }
 
+      progress.stop()
       sendMessageToParent('FORM_SUBMITTED')
     } catch (err: Any) {
       /**
@@ -237,6 +230,7 @@ export const Renderer: FC<RendererProps> = ({ form, query, locale, contactId }) 
         enableQuestionList={form.settings?.enableQuestionList}
         enableNavigationArrows={form.settings?.enableNavigationArrows}
         onSubmit={handleSubmit}
+        onChange={progress.handleChange}
       />
 
       {/* Custom css */}

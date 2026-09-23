@@ -19,6 +19,7 @@ import {
   FormService,
   IntegrationService,
   PaymentService,
+  ProgressCaptureService,
   SubmissionIpLimitService,
   SubmissionService
 } from '@service'
@@ -27,6 +28,8 @@ import {
   GqlClient,
   assertFormIsAcceptingSubmissions,
   assertSafeSpecialFieldAnswers,
+  buildProgressPayload,
+  isValidProgressSessionId,
   normalizeSubmissionHiddenFields,
   resolvePaymentConfiguration,
   selectSubmissionFields
@@ -42,7 +45,8 @@ export class CompleteSubmissionResolver {
     private readonly submissionIpLimitService: SubmissionIpLimitService,
     private readonly formReportService: FormReportService,
     private readonly integrationService: IntegrationService,
-    private readonly paymentService: PaymentService
+    private readonly paymentService: PaymentService,
+    private readonly progressCaptureService: ProgressCaptureService
   ) {}
 
   @Mutation(returns => CompleteSubmissionType)
@@ -184,6 +188,7 @@ export class CompleteSubmissionResolver {
       form.settings.quotaLimit! > 0
         ? form.settings.quotaLimit
         : undefined
+    const hiddenFields = normalizeSubmissionHiddenFields(form.hiddenFields, input.hiddenFields)
     const submissionId = await this.submissionService.createWithinQuota(
       {
         teamId: form.teamId,
@@ -191,7 +196,7 @@ export class CompleteSubmissionResolver {
         category,
         title: form.name,
         answers,
-        hiddenFields: normalizeSubmissionHiddenFields(form.hiddenFields, input.hiddenFields),
+        hiddenFields,
         variables,
         startAt,
         endAt,
@@ -222,6 +227,26 @@ export class CompleteSubmissionResolver {
 
     // Integration Queue
     this.integrationService.addQueue(form, submissionId)
+
+    // Progress capture: mark the lead started by saveProgress as complete.
+    // Fire-and-forget so a slow webhook never delays the respondent.
+    if (
+      this.progressCaptureService.isEnabled &&
+      category !== SubmissionCategoryEnum.SPAM &&
+      isValidProgressSessionId(input.progressSessionId)
+    ) {
+      void this.progressCaptureService.send(
+        buildProgressPayload({
+          event: 'complete',
+          sessionId: input.progressSessionId,
+          form,
+          answers,
+          hiddenFields,
+          submissionId,
+          now: endAt
+        })
+      )
+    }
 
     return result
   }
