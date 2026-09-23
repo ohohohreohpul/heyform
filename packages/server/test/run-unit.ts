@@ -15,7 +15,8 @@ const tests = [
   'oidc-security.test.ts',
   'oidc-provisioning.test.ts',
   'progress-capture.test.ts',
-  'save-progress.test.ts'
+  'save-progress.test.ts',
+  'form-page-meta.test.ts'
 ]
 const serverRoot = path.resolve(__dirname, '..')
 

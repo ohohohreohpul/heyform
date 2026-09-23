@@ -1371,6 +1371,8 @@
         "centerLabel": "Middle label",
         "rightLabel": "Right label",
         "defaultCountry": "Default country",
+        "addressCountry": "Country",
+        "askCountry": "Ask the respondent",
         "buttonText": "Button text",
         "redirect": "Redirect on completion",
         "shape": "Shape",

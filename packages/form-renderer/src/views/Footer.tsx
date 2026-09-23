@@ -5,7 +5,6 @@ import { useTranslation } from '../utils'
 
 import { Button, Tooltip } from '../components'
 import { useStore } from '../store'
-import { Branding } from './Branding'
 
 export const Footer: FC = () => {
   const { state, dispatch } = useStore()
@@ -70,7 +69,6 @@ export const Footer: FC = () => {
             )}
           </div>
 
-          <Branding />
         </div>
       </div>
     </div>

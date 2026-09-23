@@ -1,0 +1,279 @@
+{
+  "id": "lpc-intake-preview",
+  "teamId": "preview",
+  "name": "LovePetCare — Get started",
+  "suspended": false,
+  "settings": {
+    "active": true,
+    "captchaKind": "none",
+    "enableProgress": true,
+    "enableNavigationArrows": true,
+    "locale": "en",
+    "removeBranding": true
+  },
+  "hiddenFields": [
+    {
+      "id": "hf_utm_source",
+      "name": "utm_source"
+    },
+    {
+      "id": "hf_utm_medium",
+      "name": "utm_medium"
+    },
+    {
+      "id": "hf_utm_campaign",
+      "name": "utm_campaign"
+    },
+    {
+      "id": "hf_gclid",
+      "name": "gclid"
+    }
+  ],
+  "logics": [],
+  "variables": [],
+  "fields": [
+    {
+      "id": "welcome",
+      "kind": "welcome",
+      "title": "Let's find the right care for your pet",
+      "description": "About 2 minutes. We save your answers as you go, so nothing gets lost if you step away.",
+      "properties": {
+        "buttonText": "Let's go"
+      },
+      "layout": {
+        "mediaType": "image",
+        "mediaUrl": "https://lpc-2026.vercel.app/assets/hero-dog.webp",
+        "align": "split_right",
+        "brightness": 0
+      }
+    },
+    {
+      "id": "service_city",
+      "kind": "picture_choice",
+      "title": "Where do you need care?",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "choices": [
+          {
+            "id": "city_nyc",
+            "label": "New York City",
+            "image": "https://lpc-2026.vercel.app/assets/city-nyc.webp"
+          },
+          {
+            "id": "city_la",
+            "label": "Los Angeles",
+            "image": "https://lpc-2026.vercel.app/assets/city-la.webp"
+          }
+        ]
+      }
+    },
+    {
+      "id": "full_name",
+      "kind": "full_name",
+      "title": "Great! What's your name?",
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "id": "email",
+      "kind": "email",
+      "title": "What's the best email for you?",
+      "description": "We'll send your care plan and meet-and-greet details here.",
+      "validations": {
+        "required": true
+      }
+    },
+    {
+      "id": "phone",
+      "kind": "phone_number",
+      "title": "And a phone number?",
+      "description": "Only for arranging care. No marketing calls.",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "defaultCountryCode": "US"
+      }
+    },
+    {
+      "id": "pet_types",
+      "kind": "picture_choice",
+      "title": "Who are we caring for?",
+      "description": "Pick all that apply.",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "allowMultiple": true,
+        "choices": [
+          {
+            "id": "pet_dog",
+            "label": "Dog",
+            "image": "https://lpc-2026.vercel.app/assets/svc-dog-walking.webp"
+          },
+          {
+            "id": "pet_cat",
+            "label": "Cat",
+            "image": "https://lpc-2026.vercel.app/assets/svc-cat-sitting.webp"
+          },
+          {
+            "id": "pet_exotic",
+            "label": "Bird, reptile or small pet",
+            "image": "https://lpc-2026.vercel.app/assets/svc-exotic.webp"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pet_names",
+      "kind": "short_text",
+      "title": "What are their names?",
+      "description": "We love getting to know them."
+    },
+    {
+      "id": "care_type",
+      "kind": "multiple_choice",
+      "title": "What kind of care do you need?",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "choices": [
+          {
+            "id": "care_as_needed",
+            "label": "As-needed, when something comes up"
+          },
+          {
+            "id": "care_recurring",
+            "label": "Recurring, same days each week"
+          },
+          {
+            "id": "care_vacation",
+            "label": "Vacation care while I'm away"
+          }
+        ]
+      }
+    },
+    {
+      "id": "schedule",
+      "kind": "long_text",
+      "title": "Tell us about the schedule",
+      "description": "Days, times, walks, feeding, meds. Whatever helps us plan."
+    },
+    {
+      "id": "address",
+      "kind": "address",
+      "title": "Where will we be visiting?",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "defaultCountryCode": "US"
+      }
+    },
+    {
+      "id": "contact_methods",
+      "kind": "multiple_choice",
+      "title": "How should we reach you?",
+      "validations": {
+        "required": true
+      },
+      "properties": {
+        "allowMultiple": true,
+        "choices": [
+          {
+            "id": "contact_text",
+            "label": "Text message"
+          },
+          {
+            "id": "contact_call",
+            "label": "Phone call"
+          },
+          {
+            "id": "contact_email",
+            "label": "Email"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sms_consent",
+      "kind": "yes_no",
+      "title": "Can we text you about your pet's care?",
+      "description": "Message and data rates may apply. Consent isn't a condition of purchase.",
+      "properties": {
+        "choices": [
+          {
+            "id": "sms_yes",
+            "label": "Yes"
+          },
+          {
+            "id": "sms_no",
+            "label": "No"
+          }
+        ]
+      }
+    },
+    {
+      "id": "meet_preference",
+      "kind": "short_text",
+      "title": "When suits you for a free meet-and-greet?",
+      "description": "For example: weekday evenings, Saturday morning."
+    },
+    {
+      "id": "hear_about",
+      "kind": "multiple_choice",
+      "title": "Last one: how did you hear about us?",
+      "properties": {
+        "allowMultiple": true,
+        "choices": [
+          {
+            "id": "hear_google",
+            "label": "Google search"
+          },
+          {
+            "id": "hear_instagram",
+            "label": "Instagram"
+          },
+          {
+            "id": "hear_client",
+            "label": "Previous client"
+          },
+          {
+            "id": "hear_referral",
+            "label": "A friend or referral"
+          },
+          {
+            "id": "hear_other",
+            "label": "Somewhere else"
+          }
+        ]
+      }
+    },
+    {
+      "id": "thank_you",
+      "kind": "thank_you",
+      "title": "Thank you! We'll be in touch soon.",
+      "description": "Our care team replies within one business day to set up your free meet-and-greet.",
+      "layout": {
+        "mediaType": "image",
+        "mediaUrl": "https://lpc-2026.vercel.app/assets/hero-cat.webp",
+        "align": "split_right",
+        "brightness": 0
+      }
+    }
+  ],
+  "themeSettings": {
+    "theme": {
+      "fontFamily": "Nunito",
+      "questionTextColor": "#24204f",
+      "answerTextColor": "#494e8f",
+      "buttonBackground": "#a8480a",
+      "buttonTextColor": "#ffffff",
+      "backgroundColor": "#fff8e8"
+    }
+  }
+}

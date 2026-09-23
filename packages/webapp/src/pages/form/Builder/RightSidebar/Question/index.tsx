@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStoreContext } from '../../store'
+import AddressSettings from './Address'
 import CoverAndLayout from './CoverAndLayout'
 import DateSettings from './Date'
 import MultipleChoiceSettings from './MultipleChoice'
@@ -31,6 +32,9 @@ const Settings = ({ field }: RequiredSettingsProps) => {
 
       case FieldKindEnum.PHONE_NUMBER:
         return <PhoneNumberSettings field={field} />
+
+      case FieldKindEnum.ADDRESS:
+        return <AddressSettings field={field} />
 
       case FieldKindEnum.RATING:
         return <RatingSettings field={field} />

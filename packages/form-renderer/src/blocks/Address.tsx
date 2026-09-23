@@ -26,8 +26,15 @@ export const Address: FC<BlockProps> = ({ field, ...restProps }) => {
     return field.validations?.required
   }, [field.id, field.validations?.required, state.errorFieldId, state.values])
 
+  // When the form fixes the country, the picker is hidden and the country is
+  // added to every answer instead.
+  const fixedCountry = field.properties?.defaultCountryCode
+
   function getValues(values: any) {
-    return hasFilled(values) ? values : undefined
+    if (!hasFilled(values)) {
+      return undefined
+    }
+    return fixedCountry ? { ...values, country: fixedCountry } : values
   }
 
   function handleValuesChange(_: any, values: any) {
@@ -92,7 +99,7 @@ export const Address: FC<BlockProps> = ({ field, ...restProps }) => {
                 }
               ]}
             >
-              <Input placeholder={t('State/Province')} />
+              <Input placeholder={fixedCountry === 'US' ? t('State') : t('State/Province')} />
             </FormField>
           </div>
 
@@ -107,24 +114,26 @@ export const Address: FC<BlockProps> = ({ field, ...restProps }) => {
                 }
               ]}
             >
-              <Input placeholder={t('Zip/Postal Code')} />
+              <Input placeholder={fixedCountry === 'US' ? t('ZIP code') : t('Zip/Postal Code')} />
             </FormField>
 
-            <FormField
-              className="w-full flex-1"
-              name="country"
-              rules={[
-                {
-                  required: isRequired,
-                  message: t('This field is required')
-                }
-              ]}
-            >
-              <CountrySelect
-                placeholder={t('Country')}
-                onDropdownVisibleChange={setIsDropdownShown}
-              />
-            </FormField>
+            {!fixedCountry && (
+              <FormField
+                className="w-full flex-1"
+                name="country"
+                rules={[
+                  {
+                    required: isRequired,
+                    message: t('This field is required')
+                  }
+                ]}
+              >
+                <CountrySelect
+                  placeholder={t('Country')}
+                  onDropdownVisibleChange={setIsDropdownShown}
+                />
+              </FormField>
+            )}
           </div>
         </div>
       </Form>

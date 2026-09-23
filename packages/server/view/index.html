@@ -2,19 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>HeyForm</title>
+  <title>{{#if title}}{{title}}{{else}}Forms{{/if}}</title>
+  {{#if description}}
+  <meta content="{{description}}" name="description" />
+  <meta content="{{description}}" property="og:description" />
+  {{/if}}
+  {{#if title}}
+  <meta content="{{title}}" property="og:title" />
+  {{/if}}
+  {{#if image}}
+  <meta content="{{image}}" property="og:image" />
+  {{/if}}
   <link href="https://cdnjs.cloudflare.com" rel="dns-prefetch" />
   <link href="https://js.stripe.com" rel="dns-prefetch" />
   {{#if heyform.enableGoogleFonts}}
   <link href="https://fonts.gstatic.com" rel="dns-prefetch" />
   {{/if}}
   <meta content="width=device-width, initial-scale=1" name="viewport" />
-  <meta content="HeyForm" name="application-name" />
+  <meta content="{{#if title}}{{title}}{{else}}Forms{{/if}}" name="application-name" />
   <meta content="yes" name="mobile-web-app-capable" />
   <meta content="yes" name="apple-mobile-web-app-capable" />
   <meta content="white" name="apple-mobile-web-app-status-bar-style" />
   <meta content="#fff" name="theme-color" />
-  <meta content="HeyForm" name="apple-mobile-web-app-title" />
+  <meta content="{{#if title}}{{title}}{{else}}Forms{{/if}}" name="apple-mobile-web-app-title" />
   <meta content="telephone=no,email=no" name="format-detection" />
   <meta content="on" http-equiv="x-dns-prefetch-control" />
   <link href="/static/favicon.ico" rel="shortcut icon" />

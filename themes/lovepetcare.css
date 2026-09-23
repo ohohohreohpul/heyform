@@ -10,6 +10,9 @@
  *   Button text:     #ffffff
  *   Background:      #fff8e8  (warm white)
  *
+ * Every rule is scoped under .heyform-root so it outranks the renderer's
+ * own selectors (e.g. `.heyform-wrapper h1`, `button.heyform-submit-button`).
+ *
  * Style reference: stacked choice cards with a letter badge, one-line hint,
  * and a clear selected state; a slim progress indicator; soft "pop" shadows
  * matching lovepetcare.com.
@@ -31,24 +34,39 @@
 }
 
 /* Headings in the site's display face */
-.heyform-block-title {
+.heyform-root .heyform-block-title {
   font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(1.625rem, 1.2rem + 1.2vw, 2.25rem);
+  line-height: 1.15;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--lpc-ink);
 }
 
-.heyform-block-description {
+/* Welcome and thank-you screens get a bigger, poster-style headline */
+.heyform-root .heyform-empty-state .heyform-block-title {
+  font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3.5rem);
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.heyform-root .heyform-empty-state .heyform-submit-button {
+  font-size: 1.25rem;
+  padding: 0.75rem 2.25rem;
+}
+
+.heyform-root .heyform-block-description {
   color: var(--lpc-violet);
   opacity: 0.85;
 }
 
 /* Choice cards */
-.heyform-radio {
+.heyform-root .heyform-radio {
   margin-bottom: 0.75rem;
 }
 
-.heyform-radio-container {
+.heyform-root .heyform-radio-container {
+  box-sizing: border-box;
   background: var(--lpc-card);
   border: 1.5px solid var(--lpc-line);
   border-radius: var(--lpc-radius);
@@ -62,27 +80,27 @@
     background-color 180ms var(--lpc-ease);
 }
 
-.heyform-radio-container:hover,
-.heyform-radio-highlighted .heyform-radio-container {
+.heyform-root .heyform-radio-container:hover,
+.heyform-root .heyform-radio-highlighted .heyform-radio-container {
   background: var(--lpc-card);
   border-color: var(--lpc-violet);
   transform: translateY(-1px);
   box-shadow: var(--lpc-pop-strong);
 }
 
-.heyform-radio:active .heyform-radio-container {
+.heyform-root .heyform-radio:active .heyform-radio-container {
   transform: translateY(2px);
   box-shadow: 0 1px 0 rgba(36, 32, 79, 0.18);
 }
 
-.heyform-radio-selected .heyform-radio-container {
+.heyform-root .heyform-radio-selected .heyform-radio-container {
   background: var(--lpc-orange-wash);
   border-color: var(--lpc-orange-deep);
   box-shadow: 0 4px 0 rgba(168, 72, 10, 0.25);
 }
 
 /* Letter badge (A, B, C …) */
-.heyform-radio-hotkey {
+.heyform-root .heyform-radio-hotkey {
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 0.5rem;
@@ -92,36 +110,88 @@
   font-weight: 800;
 }
 
-.heyform-radio-selected .heyform-radio-hotkey {
+.heyform-root .heyform-radio-selected .heyform-radio-hotkey {
   background: var(--lpc-orange-deep);
   box-shadow: none;
   color: #fff;
 }
 
-.heyform-radio-label {
+.heyform-root .heyform-radio-label,
+.heyform-root .heyform-multiple-choice .heyform-radio-group .heyform-radio-label {
   margin-left: 0.75rem;
   font-weight: 700;
+  /* The renderer breaks words mid-way (break-all); wrap on spaces instead */
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
-.heyform-radio-icon svg {
+/* Picture card labels wrap to two lines instead of truncating */
+.heyform-root .heyform-picture-choice .heyform-radio-label {
+  overflow: hidden;
+  white-space: normal;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.heyform-root .heyform-picture-choice .heyform-radio-content {
+  align-items: flex-start;
+}
+
+.heyform-root .heyform-radio-icon svg {
   color: var(--lpc-orange-deep);
 }
 
-/* Picture choices (pet type, service) */
-.heyform-radio-image {
-  border-radius: calc(var(--lpc-radius) - 0.25rem);
+/* Picture choices (city, pet type): larger cards, photos fill the frame */
+.heyform-root .heyform-picture-choice .heyform-radio-group {
+  margin-inline: -0.5rem;
+}
+
+.heyform-root .heyform-picture-choice .heyform-radio {
+  height: 15rem;
+  margin-bottom: 1rem;
+  padding-inline: 0.5rem;
+}
+
+.heyform-root .heyform-picture-choice .heyform-radio-container {
+  padding: 0.5rem 0.5rem 0.75rem;
+}
+
+.heyform-root .heyform-radio-image {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0;
+  border-radius: calc(var(--lpc-radius) - 0.35rem);
   overflow: hidden;
   background: var(--lpc-orange-wash);
 }
 
+.heyform-root .heyform-radio-image img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
+
 /* Text, email and phone inputs */
-.heyform-input input,
-.heyform-input textarea {
+.heyform-root .heyform-input input,
+.heyform-root .heyform-input textarea {
   font-weight: 600;
 }
 
+/* Address: side-by-side City/State fields line up on wider screens */
+@media (min-width: 640px) {
+  .heyform-root .heyform-address .flex > * + * {
+    margin-top: 0;
+  }
+}
+
 /* Buttons */
-.heyform-submit-button {
+.heyform-root .heyform-submit-button {
   border-radius: 999px;
   padding-inline: 1.75rem;
   font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
@@ -132,38 +202,61 @@
     box-shadow 150ms var(--lpc-ease);
 }
 
-.heyform-submit-button:hover {
+.heyform-root .heyform-submit-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 0 #6e2f06;
 }
 
-.heyform-submit-button:active {
+.heyform-root .heyform-submit-button:active {
   transform: translateY(3px);
   box-shadow: 0 2px 0 #6e2f06;
 }
 
-.heyform-submit-button:focus-visible,
-.heyform-radio-container:focus-visible {
+.heyform-root .heyform-submit-button:focus-visible,
+.heyform-root .heyform-radio-container:focus-visible {
   outline: 3px solid var(--lpc-orange);
   outline-offset: 3px;
 }
 
-/* Progress indicator */
-.heyform-progress {
-  color: var(--lpc-violet);
+/* On phones the split-layout photo is a short banner: keep faces in frame */
+@media (max-width: 800px) {
+  .heyform-root .heyform-layout img {
+    object-position: center 25%;
+  }
+}
+
+/* Selected corner tick on picture cards */
+.heyform-root .heyform-picture-choice .heyform-radio-icon::before {
+  border-color: var(--lpc-orange-deep) var(--lpc-orange-deep) transparent transparent;
+  border-radius: 0 var(--lpc-radius) 0 0;
+}
+
+.heyform-root .heyform-picture-choice .heyform-radio-icon svg {
+  color: #fff;
+}
+
+/* Progress pill and up/down arrows */
+.heyform-root .heyform-progress {
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem 0.35rem 0.5rem;
+  color: var(--heyform-button-text-color);
   font-weight: 700;
 }
 
+.heyform-root .heyform-pagination button.button {
+  border-radius: 999px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .heyform-radio-container,
-  .heyform-submit-button {
+  .heyform-root .heyform-radio-container,
+  .heyform-root .heyform-submit-button {
     transition: none;
   }
 
-  .heyform-radio-container:hover,
-  .heyform-radio:active .heyform-radio-container,
-  .heyform-submit-button:hover,
-  .heyform-submit-button:active {
+  .heyform-root .heyform-radio-container:hover,
+  .heyform-root .heyform-radio:active .heyform-radio-container,
+  .heyform-root .heyform-submit-button:hover,
+  .heyform-root .heyform-submit-button:active {
     transform: none;
   }
 }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LovePetCare form preview</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <script>
+    ;(function () {
+      const userAgent = window.navigator.userAgent
+      window.heyform = {
+        device: {
+          ios: /iPad|iPhone|iPod/i.test(userAgent),
+          android: /Android/i.test(userAgent),
+          mobile: /Android|iPad|iPhone|iPod/i.test(userAgent),
+          windowHeight: window.innerHeight,
+          screenHeight: window.screen.height
+        }
+      }
+    })()
+  </script>
+</head>
+<body>
+  <!-- Local design preview: renders themes/lovepetcare-intake.json with no server. -->
+  <div id="heyform-render-root"></div>
+  <script src="./src/preview/main.tsx" type="module"></script>
+</body>
+</html>

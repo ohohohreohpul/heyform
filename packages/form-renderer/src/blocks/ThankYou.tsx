@@ -5,7 +5,6 @@ import { useEffect } from 'react'
 import { isURL } from '../utils'
 
 import { useStore } from '../store'
-import { WelcomeBranding } from '../views/Branding'
 import type { BlockProps } from './Block'
 import { Block } from './Block'
 
@@ -36,7 +35,6 @@ export const ThankYou: FC<BlockProps> = ({ field, className, children, ...restPr
         isScrollable={false}
         {...restProps}
       />
-      <WelcomeBranding />
     </>
   )
 }

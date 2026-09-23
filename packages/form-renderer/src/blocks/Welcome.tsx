@@ -4,7 +4,6 @@ import type { FC } from 'react'
 import { replaceHTML } from '../utils'
 
 import { useStore } from '../store'
-import { WelcomeBranding } from '../views/Branding'
 import type { BlockProps } from './Block'
 import { EmptyState } from './EmptyState'
 
@@ -35,7 +34,6 @@ export const Welcome: FC<BlockProps> = ({ field, ...restProps }) => {
         field={newField}
         onClick={handleClick}
       />
-      <WelcomeBranding />
     </>
   )
 }
