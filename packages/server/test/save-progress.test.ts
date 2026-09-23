@@ -35,7 +35,28 @@ function buildForm(overrides: Record<string, any> = {}) {
   }
 }
 
-function buildResolver(form: any, enabled = true) {
+const CLIENT = { ip: '203.0.113.10', deviceId: 'd', lang: 'en', userAgent: {} as any }
+
+/** In-memory stand-in for the RedisService methods the resolver uses. */
+function fakeRedis() {
+  const store = new Map<string, string>()
+  return {
+    store,
+    get: async (key: string) => store.get(key) ?? null,
+    setIfAbsent: async (key: string, value: string) => {
+      if (store.has(key)) return false
+      store.set(key, value)
+      return true
+    },
+    incrementWithExpiry: async (key: string) => {
+      const next = Number(store.get(key) ?? 0) + 1
+      store.set(key, String(next))
+      return next
+    }
+  }
+}
+
+function buildResolver(form: any, enabled = true, redis = fakeRedis()) {
   const sent: any[] = []
   const endpointService = {
     decryptToken: () => ({ formId: 'form_1', timestamp: NOW }),
@@ -51,10 +72,11 @@ function buildResolver(form: any, enabled = true) {
   const resolver = new SaveProgressResolver(
     endpointService as any,
     { findById: async () => form } as any,
-    progressCaptureService as any
+    progressCaptureService as any,
+    redis as any
   )
 
-  return { resolver, sent }
+  return { resolver, sent, redis }
 }
 
 const baseInput = {
@@ -67,7 +89,7 @@ const baseInput = {
 async function testSkipsUntilContactIsAnswered() {
   const { resolver, sent } = buildResolver(buildForm())
 
-  const result = await resolver.saveProgress({ ...baseInput, answers: { name_1: 'Jamie' } })
+  const result = await resolver.saveProgress(CLIENT, { ...baseInput, answers: { name_1: 'Jamie' } })
 
   assert.strictEqual(result, false)
   assert.strictEqual(sent.length, 0)
@@ -76,7 +98,7 @@ async function testSkipsUntilContactIsAnswered() {
 async function testSendsAnsweredFieldsOnceContactIsValid() {
   const { resolver, sent } = buildResolver(buildForm())
 
-  const result = await resolver.saveProgress({
+  const result = await resolver.saveProgress(CLIENT, {
     ...baseInput,
     answers: { name_1: 'Jamie', email_1: 'jamie@example.com' }
   })
@@ -95,7 +117,7 @@ async function testSendsAnsweredFieldsOnceContactIsValid() {
 async function testIgnoresUnknownHiddenFields() {
   const { resolver, sent } = buildResolver(buildForm())
 
-  await resolver.saveProgress({
+  await resolver.saveProgress(CLIENT, {
     ...baseInput,
     hiddenFields: [{ id: 'evil', name: 'injected', value: 'x' }],
     answers: { email_1: 'jamie@example.com' }
@@ -107,7 +129,7 @@ async function testIgnoresUnknownHiddenFields() {
 async function testNoopWhenDisabled() {
   const { resolver, sent } = buildResolver(buildForm(), false)
 
-  const result = await resolver.saveProgress({
+  const result = await resolver.saveProgress(CLIENT, {
     ...baseInput,
     answers: { email_1: 'jamie@example.com' }
   })
@@ -119,16 +141,63 @@ async function testNoopWhenDisabled() {
 async function testRejectsInactiveFormsAndBadSessions() {
   const inactive = buildResolver(buildForm({ settings: { active: false } }))
   await assert.rejects(() =>
-    inactive.resolver.saveProgress({ ...baseInput, answers: { email_1: 'jamie@example.com' } })
+    inactive.resolver.saveProgress(CLIENT, {
+      ...baseInput,
+      answers: { email_1: 'jamie@example.com' }
+    })
   )
 
   const { resolver } = buildResolver(buildForm())
   await assert.rejects(() =>
-    resolver.saveProgress({
+    resolver.saveProgress(CLIENT, {
       ...baseInput,
       sessionId: 'bad session!',
       answers: { email_1: 'jamie@example.com' }
     })
+  )
+}
+
+async function testOneSessionPerOpenToken() {
+  const { resolver, sent } = buildResolver(buildForm())
+  const answers = { email_1: 'jamie@example.com' }
+
+  assert.strictEqual(await resolver.saveProgress(CLIENT, { ...baseInput, answers }), true)
+  // Further saves from the same visit keep working.
+  assert.strictEqual(await resolver.saveProgress(CLIENT, { ...baseInput, answers }), true)
+
+  // Replaying the same form token with a fresh session id is rejected.
+  await assert.rejects(() =>
+    resolver.saveProgress(CLIENT, { ...baseInput, sessionId: 'another_session_1', answers })
+  )
+  assert.strictEqual(sent.length, 2)
+}
+
+async function testCapsNewSessionsPerIp() {
+  const redis = fakeRedis()
+  const answers = { email_1: 'jamie@example.com' }
+  let forwarded = 0
+
+  for (let i = 0; i < 12; i++) {
+    const { resolver } = buildResolver(buildForm(), true, redis)
+    const result = await resolver.saveProgress(CLIENT, {
+      ...baseInput,
+      sessionId: `session_${String(i).padStart(8, '0')}`,
+      openToken: `token-${i}`,
+      answers
+    })
+    forwarded += result ? 1 : 0
+  }
+
+  assert.strictEqual(forwarded, 10, 'only the first 10 new leads per IP per hour are forwarded')
+
+  // A different IP is unaffected.
+  const { resolver } = buildResolver(buildForm(), true, redis)
+  assert.strictEqual(
+    await resolver.saveProgress(
+      { ...CLIENT, ip: '198.51.100.7' },
+      { ...baseInput, openToken: 'token-other-ip', answers }
+    ),
+    true
   )
 }
 
@@ -189,6 +258,8 @@ async function run() {
   await testIgnoresUnknownHiddenFields()
   await testNoopWhenDisabled()
   await testRejectsInactiveFormsAndBadSessions()
+  await testOneSessionPerOpenToken()
+  await testCapsNewSessionsPerIp()
   await testCompleteSubmissionForwardsFinalEvent()
 }
 

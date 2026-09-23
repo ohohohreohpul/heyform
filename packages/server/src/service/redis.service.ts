@@ -173,6 +173,11 @@ export class RedisService {
     }
   }
 
+  /** Sets the key only if it does not exist yet. Returns whether it was set. */
+  public async setIfAbsent(key: string, value: string, ttl: string): Promise<boolean> {
+    return (await this.redis.set(key, value, 'EX', hs(ttl), 'NX')) === 'OK'
+  }
+
   public set({ key, value, duration }: SetOptions): Promise<any> {
     return this.redis.set(key, value, 'ex', hs(duration))
   }
