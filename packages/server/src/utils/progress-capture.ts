@@ -6,7 +6,7 @@ import {
 } from '@heyform-inc/shared-types-enums'
 import { createHmac } from 'crypto'
 
-import { fieldValuesToAnswers } from '@heyform-inc/answer-utils'
+import { fieldValuesToAnswers, parsePlainAnswer } from '@heyform-inc/answer-utils'
 import { helper } from '@heyform-inc/utils'
 
 /**
@@ -23,6 +23,8 @@ export interface ProgressAnswer {
   title: string
   kind: FieldKindEnum
   value: any
+  /** Human-readable value, e.g. choice labels instead of choice ids. */
+  text: string
 }
 
 export interface ProgressPayload {
@@ -86,7 +88,13 @@ export function buildProgressPayload(options: BuildProgressPayloadOptions): Prog
     formId: options.form.id ?? '',
     formName: options.form.name ?? '',
     sentAt: options.now,
-    answers: options.answers.map(({ id, title, kind, value }) => ({ id, title, kind, value })),
+    answers: options.answers.map(answer => ({
+      id: answer.id,
+      title: answer.title,
+      kind: answer.kind,
+      value: answer.value,
+      text: parsePlainAnswer(answer)
+    })),
     hiddenFields: toHiddenFieldMap(options.hiddenFields)
   }
 

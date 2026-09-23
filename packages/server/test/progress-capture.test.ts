@@ -94,8 +94,20 @@ function testPayloadShape() {
     formName: 'Intake',
     sentAt: 1_700_000_000,
     answers: [
-      { id: 'name_1', title: 'Your name', kind: FieldKindEnum.SHORT_TEXT, value: 'Jamie' },
-      { id: 'email_1', title: 'Email', kind: FieldKindEnum.EMAIL, value: 'jamie@example.com' }
+      {
+        id: 'name_1',
+        title: 'Your name',
+        kind: FieldKindEnum.SHORT_TEXT,
+        value: 'Jamie',
+        text: 'Jamie'
+      },
+      {
+        id: 'email_1',
+        title: 'Email',
+        kind: FieldKindEnum.EMAIL,
+        value: 'jamie@example.com',
+        text: 'jamie@example.com'
+      }
     ],
     hiddenFields: { utm_source: 'google' }
   })
@@ -114,6 +126,35 @@ function testPayloadShape() {
   assert.strictEqual(complete.submissionId, 'sub_1')
 }
 
+function testChoiceAnswersCarryReadableText() {
+  const fields: any[] = [
+    {
+      id: 'pets_1',
+      title: 'Which pets?',
+      kind: FieldKindEnum.MULTIPLE_CHOICE,
+      validations: {},
+      properties: {
+        allowMultiple: true,
+        choices: [
+          { id: 'c_dog', label: 'Dog' },
+          { id: 'c_cat', label: 'Cat' }
+        ]
+      }
+    }
+  ]
+  const answers = collectProgressAnswers(fields, { pets_1: { value: ['c_dog', 'c_cat'] } })
+  const payload = buildProgressPayload({
+    event: 'progress',
+    sessionId: 'session_12345',
+    form: { id: 'form_1', name: 'Intake' },
+    answers,
+    hiddenFields: [],
+    now: 1
+  })
+
+  assert.strictEqual(payload.answers[0].text, 'Dog, Cat')
+}
+
 function testSignature() {
   const body = '{"a":1}'
   const expected = createHmac('sha256', 'secret').update(`1700000000.${body}`).digest('hex')
@@ -127,6 +168,7 @@ async function run() {
   testCollectsOnlyAnsweredValidFields()
   testContactGate()
   testPayloadShape()
+  testChoiceAnswersCarryReadableText()
   testSignature()
 }
 
