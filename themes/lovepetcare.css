@@ -1,0 +1,169 @@
+/*
+ * LovePetCare theme for HeyForm — paste into a form's
+ * Theme → Customize → Custom CSS.
+ *
+ * Set these in the theme panel first (the CSS below builds on them):
+ *   Font:            Nunito
+ *   Question color:  #24204f  (ink)
+ *   Answer color:    #494e8f  (violet)
+ *   Button color:    #a8480a  (deep orange — passes WCAG AA with white text)
+ *   Button text:     #ffffff
+ *   Background:      #fff8e8  (warm white)
+ *
+ * Style reference: stacked choice cards with a letter badge, one-line hint,
+ * and a clear selected state; a slim progress indicator; soft "pop" shadows
+ * matching lovepetcare.com.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap');
+
+:root {
+  --lpc-ink: #24204f;
+  --lpc-violet: #494e8f;
+  --lpc-orange: #ffa15f;
+  --lpc-orange-deep: #a8480a;
+  --lpc-orange-wash: #fff1e4;
+  --lpc-card: #ffffff;
+  --lpc-line: rgba(36, 32, 79, 0.14);
+  --lpc-pop: 0 4px 0 rgba(36, 32, 79, 0.12);
+  --lpc-pop-strong: 0 5px 0 rgba(36, 32, 79, 0.22);
+  --lpc-radius: 1rem;
+  --lpc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Headings in the site's display face */
+.heyform-block-title {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lpc-ink);
+}
+
+.heyform-block-description {
+  color: var(--lpc-violet);
+  opacity: 0.85;
+}
+
+/* Choice cards */
+.heyform-radio {
+  margin-bottom: 0.75rem;
+}
+
+.heyform-radio-container {
+  background: var(--lpc-card);
+  border: 1.5px solid var(--lpc-line);
+  border-radius: var(--lpc-radius);
+  box-shadow: var(--lpc-pop);
+  padding: 0.875rem 1rem;
+  color: var(--lpc-ink);
+  transition:
+    transform 180ms var(--lpc-ease),
+    box-shadow 180ms var(--lpc-ease),
+    border-color 180ms var(--lpc-ease),
+    background-color 180ms var(--lpc-ease);
+}
+
+.heyform-radio-container:hover,
+.heyform-radio-highlighted .heyform-radio-container {
+  background: var(--lpc-card);
+  border-color: var(--lpc-violet);
+  transform: translateY(-1px);
+  box-shadow: var(--lpc-pop-strong);
+}
+
+.heyform-radio:active .heyform-radio-container {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(36, 32, 79, 0.18);
+}
+
+.heyform-radio-selected .heyform-radio-container {
+  background: var(--lpc-orange-wash);
+  border-color: var(--lpc-orange-deep);
+  box-shadow: 0 4px 0 rgba(168, 72, 10, 0.25);
+}
+
+/* Letter badge (A, B, C …) */
+.heyform-radio-hotkey {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--lpc-card);
+  box-shadow: inset 0 0 0 1.5px var(--lpc-line);
+  color: var(--lpc-violet);
+  font-weight: 800;
+}
+
+.heyform-radio-selected .heyform-radio-hotkey {
+  background: var(--lpc-orange-deep);
+  box-shadow: none;
+  color: #fff;
+}
+
+.heyform-radio-label {
+  margin-left: 0.75rem;
+  font-weight: 700;
+}
+
+.heyform-radio-icon svg {
+  color: var(--lpc-orange-deep);
+}
+
+/* Picture choices (pet type, service) */
+.heyform-radio-image {
+  border-radius: calc(var(--lpc-radius) - 0.25rem);
+  overflow: hidden;
+  background: var(--lpc-orange-wash);
+}
+
+/* Text, email and phone inputs */
+.heyform-input input,
+.heyform-input textarea {
+  font-weight: 600;
+}
+
+/* Buttons */
+.heyform-submit-button {
+  border-radius: 999px;
+  padding-inline: 1.75rem;
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-weight: 600;
+  box-shadow: 0 5px 0 #6e2f06;
+  transition:
+    transform 150ms var(--lpc-ease),
+    box-shadow 150ms var(--lpc-ease);
+}
+
+.heyform-submit-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 #6e2f06;
+}
+
+.heyform-submit-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #6e2f06;
+}
+
+.heyform-submit-button:focus-visible,
+.heyform-radio-container:focus-visible {
+  outline: 3px solid var(--lpc-orange);
+  outline-offset: 3px;
+}
+
+/* Progress indicator */
+.heyform-progress {
+  color: var(--lpc-violet);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heyform-radio-container,
+  .heyform-submit-button {
+    transition: none;
+  }
+
+  .heyform-radio-container:hover,
+  .heyform-radio:active .heyform-radio-container,
+  .heyform-submit-button:hover,
+  .heyform-submit-button:active {
+    transform: none;
+  }
+}
